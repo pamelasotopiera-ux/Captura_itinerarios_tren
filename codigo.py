@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-import pandas as pd
+import funciones_fecha as ff
 
 
 def itinerario(servicio,fecha,origen,destino):
@@ -16,23 +16,36 @@ def itinerario(servicio,fecha,origen,destino):
     if tabla:  
         for fila in tabla.find_all('tr')[1:]: 
             celdas = fila.find_all('td')
+            
+            miSalida = ff.componer_date_time(fecha,celdas[0].text.strip())
+            aux = True
+            if datetime.now() > miSalida:
+                #print(f'La salida {celdas[0].text} es menor a la hora actual')
+                aux= False
+            else:
+                #print(f'La salida {celdas[0].text} es mayor a la hora actual')
+                aux = True
+
             if len(celdas) >= 4:  
                 datos.append({
+                    'fecha': fecha,
                     'salida': celdas[0].text.strip(),
                     'llegada': celdas[1].text.strip(),
                     'duracion': celdas[2].text.strip(),
-                    'precio': celdas[3].text.strip()
+                    'precio': celdas[3].text.strip(),
+                    'salidaFutura': aux
                 })
-    salidas=()
-    salidas=celdas[0].text.strip()
+      
+    
+    
    
     print(f'en la fecha {fecha} hay {len(datos)} salidas')
     print(datos)
     return datos
   
-itinerario('1','2026-06-02','13','1')
+itinerario('1','2026-06-14','13','1')
 
-1.-mostrar las salidas posteriores a la hora actual
+"""1.-mostrar las salidas posteriores a la hora actual
    calcular hora actual
    las salidas
    def mostrar_proximas_salidas(las salidas, hora actual)
@@ -54,5 +67,5 @@ itinerario('1','2026-06-02','13','1')
 5.-guardar el itinerario en un archivo
    consultar itinerario
    Guardarlo como JSON.
-6.- Documentación.
+6.- Documentación."""
 
