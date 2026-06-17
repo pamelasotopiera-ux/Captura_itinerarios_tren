@@ -1,38 +1,63 @@
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
+import funciones_fecha as ff
 
 
-def itinerario(servicio,fecha,origen,destino):
-    url=f"https://www.efe.cl/planificador/?empresa={servicio}&hsalida=1&hregreso&usuario=1&ida=1&origen={origen}&destino={destino}&salida={fecha}"
 
+
+
+
+def itinerario(fecha,origen,destino,servicio=1):
+    url=f"https://www.efe.cl/planificador/?empresa={servicio}&hsalida=0&hregreso&usuario=1&ida=1&origen={origen}&destino={destino}&salida={fecha}"
     response = requests.get(url)
     soup = BeautifulSoup(response.text ,'html.parser')
-   
+    
     tabla = soup.find('table', class_='table tablaTren f-size-14 f-face-roboto bg-color-gris-2')
 
     datos = []
+    hora_actual= datetime.now()
     if tabla:  
         for fila in tabla.find_all('tr')[1:]: 
             celdas = fila.find_all('td')
             if len(celdas) >= 4:  
                 datos.append({
-                    'salida': celdas[0].text.strip(),
-                    'llegada': celdas[1].text.strip(),
+                    'salida': ff.incrementar_date(fecha,celdas[0].text.strip()),
+                    'llegada': ff.incrementar_date(fecha,celdas[1].text.strip()),
                     'duracion': celdas[2].text.strip(),
                     'precio': celdas[3].text.strip()
                 })
-    salidas=()
-    salidas=celdas[0].text.strip()
-   
-    print(f'en la fecha {fecha} hay {len(datos)} salidas')
-    print(datos)
-    return datos
-  
-itinerario('1','2026-06-02','13','1')
 
-1.-mostrar las salidas posteriores a la hora actual
+        contador=0
+        for salida in datos:  
+            if salida['salida'] > hora_actual:
+                contador=contador+1
+                print(salida['salida'])
+        if contador==0:
+            print ('No hay más salidas el día de hoy')
+     
+    
+
+ 
+
+
+    
+
+    
+    
+    
+    #salidas=celdas[0].text.strip()
+
+    #print(f'en la fecha {fecha} hay {len(datos)} salidas')
+    #print(datos)
+
+    #return salidas
+  
+itinerario('2026-06-16','13','1')
+
+
+"""1.-mostrar las salidas posteriores a la hora actual
    calcular hora actual
    las salidas
    def mostrar_proximas_salidas(las salidas, hora actual)
@@ -54,5 +79,5 @@ itinerario('1','2026-06-02','13','1')
 5.-guardar el itinerario en un archivo
    consultar itinerario
    Guardarlo como JSON.
-6.- Documentación.
+6.- Documentación."""
 
