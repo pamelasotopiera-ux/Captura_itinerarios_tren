@@ -1,0 +1,12 @@
+Listado de posibles errores
+1.- Error de conexión al intentar cargar la página de EFE.
+    línea 10
+
+2.- Error al extraer los datos HTML
+    línea 11
+
+2.- Error de tabla no encontrada
+    línea 14
+
+3.- Error al comparar las fechas
+    línea 31
